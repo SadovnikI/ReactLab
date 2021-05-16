@@ -1,0 +1,58 @@
+import React, {Component, useEffect, useState} from 'react'
+import axios from "axios";
+import Nav from "./Nav";
+import WaletCard from "./WaletCard";
+
+
+class WaletsPage extends Component {
+    state = {};
+    componentDidMount() {
+        if (this.props.location.state){
+            const { id } = this.props.location.state;
+            this.id=id;
+            this.forceUpdate();
+        }
+        else{
+            const config={
+            headers:{
+                Authorization: 'Token '+ localStorage.getItem('token')
+            }
+        };
+
+        axios.get('http://127.0.0.1:8000/api/auth/user',config).then(res => {this.setState({user:res.data})}).catch(err =>{
+                this.forceUpdate();
+            })
+        }
+
+    }
+
+    render() {
+
+        if (this.id){
+        return (
+            <div>
+                <Nav/>
+                <div className="wideblockr"><h2>Wallets</h2></div>
+                <WaletCard url={'http://127.0.0.1:8000/api/wallets/' + this.id + '/'}/>
+            </div>
+        );
+        }
+        else if (this.state.user){
+            return (<div>
+                <Nav/>
+                <div className="wideblockr"><h2>Wallets</h2></div>
+                <WaletCard url={'http://127.0.0.1:8000/api/wallets/' + this.state.user.id + '/'}/>
+            </div>)
+        }
+
+
+        else{
+            return (
+            <div/>
+        );
+        }
+    }
+
+}
+
+export default WaletsPage;
